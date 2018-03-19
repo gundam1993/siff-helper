@@ -1,6 +1,9 @@
 const Koa = require('koa')
 const next = require('next')
 const Router = require('koa-router')
+const ApolloServer = require('apollo-server-koa')
+const graphqlKoa = ApolloServer.graphqlKoa
+const graphiqlKoa = ApolloServer.graphiqlKoa
 
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== 'production'
@@ -11,6 +14,11 @@ app.prepare()
 .then(() => {
   const server = new Koa()
   const router = new Router()
+
+  // router.post('/graphql', koaBody(), graphqlKoa({ schema: myGraphQLSchema }))
+  router.get('/graphql', graphqlKoa({ schema: myGraphQLSchema }))
+
+  router.get('/graphiql', graphiqlKoa({ endpointURL: '/graphql' }))
 
   router.get('/a', async ctx => {
     await app.render(ctx.req, ctx.res, '/b', ctx.query)
