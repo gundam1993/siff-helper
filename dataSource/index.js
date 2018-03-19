@@ -106,6 +106,31 @@ async function buildSession (data) {
   }
 }
 
+async function bindFilmDirector(data) {
+  for (let i = 0; i < data.length; i++) {
+    let item = data[i]
+    console.log(item)
+    if (!item.film_name) continue
+    if (!item.film_total_time) continue
+    let film = await Film.findOne({
+      where: {
+        name: item.film_name
+      },
+      include: [{
+        model: Director,
+        require: false
+      }]
+    })
+    console.log(film.directors)
+    if (film.directors.length) continue
+    let directors =item.director.split('#')
+    directors = directors.map(director => (director))
+    directors = [...(new Set(directors))]
+    let infos = await Director.findAll({where: {name: directors}})
+    let bind = await film.addDirectors(infos)
+  }
+}
 // buildFilm(data)
 // buildDirector(data)
 // buildSession(data)
+bindFilmDirector(data)
